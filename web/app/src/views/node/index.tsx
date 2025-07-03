@@ -5,6 +5,7 @@ import NotData from '@/assets/images/nodata.png';
 import { NodeDetail } from "@/assets/type";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
+import { VisitSceneNode } from "@/constant";
 import { useStore } from "@/provider";
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Fab, Stack, Zoom } from "@mui/material";
@@ -82,8 +83,9 @@ const Doc = ({ node: defaultNode, token }: { node?: NodeDetail, token?: string }
 
   const getData = async (id: string) => {
     try {
-      const result = await apiClient.serverGetNodeDetail(id, kb_id || '', token, window?.location.origin);
+      const result = await apiClient.clientGetNodeDetail(id, kb_id || '', token);
       setNode(result.data);
+      apiClient.clientStatPage({ scene: VisitSceneNode, doc_id: id || '', kb_id: kb_id || '', authToken: token });
     } catch (error) {
       console.error('page Error fetching document content:', error);
     }
@@ -96,7 +98,6 @@ const Doc = ({ node: defaultNode, token }: { node?: NodeDetail, token?: string }
   }, [node])
 
   useEffect(() => {
-    console.log(docId, id, firstRequest)
     if (!firstRequest) {
       getData(docId || '')
     }

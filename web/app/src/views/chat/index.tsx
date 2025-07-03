@@ -14,7 +14,7 @@ import { AnswerStatus } from './constant';
 
 const Chat = () => {
   const inIframe = isInIframe();
-  const { mobile = false, themeMode = 'light', kb_id, kbDetail, catalogShow } = useStore()
+  const { mobile = false, kb_id, kbDetail, catalogShow } = useStore()
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const sseClientRef = useRef<SSEClient<{
@@ -164,10 +164,10 @@ const Chat = () => {
       );
       const authToken = authCookie ? authCookie.split('=')[1] : '';
       sseClientRef.current = new SSEClient({
-        url: `/share/v1/chat/message`,
+        url: `/client/v1/chat/message`,
         headers: {
           'Content-Type': 'application/json',
-          'X-Simple-Auth-Password': authToken,
+          'x-simple-auth-password': authToken,
         },
       });
     }
