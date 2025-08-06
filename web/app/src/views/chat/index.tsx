@@ -4,9 +4,9 @@ import { ChunkResultItem, ConversationItem } from '@/assets/type';
 import { useStore } from '@/provider';
 import SSEClient from '@/utils/fetch';
 import { Box, Stack } from '@mui/material';
+import { useSetState } from 'ahooks';
 import { message } from 'ct-mui';
 import dayjs from 'dayjs';
-import { useSetState } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ChatResult from './ChatResult';
 import ChatTab from './ChatTab';
@@ -277,7 +277,7 @@ const Chat = () => {
             borderColor: 'divider',
             borderRadius: '10px',
             p: 3,
-            bgcolor: 'background.paper',
+            bgcolor: 'background.paper2',
           }}
         >
           <Box

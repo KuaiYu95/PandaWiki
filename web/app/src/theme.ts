@@ -31,8 +31,10 @@ const lightTheme = createTheme(
         contrastText: '#000',
       },
       background: {
-        default: '#fff',
-        paper: '#F8F9FA',
+        default: '#FFFFFF',
+        paper0: "#F1F2F8",
+        paper: "#FFFFFF",
+        paper2: "#F8F9FA",
       },
       text: {
         primary: '#21222D',
@@ -227,7 +229,9 @@ const darkTheme = createTheme(
       },
       background: {
         default: '#141923',
-        paper: '#202531',
+        paper0: "#141923",
+        paper: '#141923',
+        paper2: "#202531",
       },
       text: {
         primary: '#FFFFFF',

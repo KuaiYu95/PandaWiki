@@ -11,28 +11,28 @@ import {
 } from '@/request/ShareAuth';
 import { getShareV1NodeList } from '@/request/ShareNode';
 
-import { DomainAuthType, ConstsSourceType } from '@/request/types';
 import Logo from '@/assets/images/logo.png';
 import Footer from '@/components/footer';
+import {
+  IconDingDing,
+  IconFeishu,
+  IconLock,
+  IconQiyeweixin,
+} from '@/components/icons';
 import { useStore } from '@/provider';
+import { ConstsSourceType, DomainAuthType } from '@/request/types';
 import {
   Box,
   Button,
+  IconButton,
   InputAdornment,
   Stack,
   TextField,
-  IconButton,
 } from '@mui/material';
 import { message } from 'ct-mui';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import {
-  IconLock,
-  IconDingDing,
-  IconFeishu,
-  IconQiyeweixin,
-} from '@/components/icons';
 
 export default function Login() {
   const [password, setPassword] = useState('');
@@ -124,7 +124,7 @@ export default function Login() {
           alignItems: 'center',
           justifyContent: 'center',
           bgcolor:
-            themeMode === 'dark' ? 'background.default' : 'background.paper',
+            themeMode === 'dark' ? 'background.default' : 'background.paper2',
         }}
       >
         <Box
@@ -134,7 +134,7 @@ export default function Login() {
             p: 4,
             backdropFilter: 'blur(2px)',
             bgcolor:
-              themeMode === 'dark' ? 'background.paper' : 'background.default',
+              themeMode === 'dark' ? 'background.paper2' : 'background.default',
             borderRadius: '10px',
             ...(mobile && {
               m: 3,
@@ -192,7 +192,7 @@ export default function Login() {
                     },
                     '& .MuiOutlinedInput-root': {
                       pr: '18px',
-                      bgcolor: 'background.paper',
+                      bgcolor: 'background.paper2',
                       '& fieldset': {
                         borderRadius: '10px',
                         borderColor: 'divider',
