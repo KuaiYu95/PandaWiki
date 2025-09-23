@@ -445,6 +445,14 @@ export interface DomainCommentReq {
   user_name?: string;
 }
 
+export interface DomainCompleteReq {
+  /** For FIM (Fill in Middle) style completion */
+  prefix?: string;
+  /** Role for role-based system prompts */
+  role?: string;
+  suffix?: string;
+}
+
 export interface DomainContributeSettings {
   is_enable?: boolean;
 }
@@ -1067,6 +1075,7 @@ export interface DomainStatPageReq {
 export interface DomainTextReq {
   /** action: improve, summary, extend, shorten, etc. */
   action?: string;
+  role?: string;
   text: string;
 }
 
