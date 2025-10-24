@@ -48,6 +48,11 @@ const Wrap = ({ detail: defaultDetail }: WrapProps) => {
     null,
   );
 
+  const isMarkdown = true;
+  // const isMarkdown = useMemo(() => {
+  //   return defaultDetail.content_type === 'markdown';
+  // }, [defaultDetail.content_type]);
+
   const isEnterprise = useMemo(() => {
     return license.edition === 2;
   }, [license]);
@@ -130,7 +135,7 @@ const Wrap = ({ detail: defaultDetail }: WrapProps) => {
       message.success('导出成功');
     }
     if (type === 'md') {
-      const markdown = editorRef.getMarkdownByJSON();
+      const markdown = editorRef.getMarkdown();
       if (!markdown) return;
       const blob = new Blob([markdown], { type: 'text/markdown' });
       const url = URL.createObjectURL(blob);
@@ -230,6 +235,7 @@ const Wrap = ({ detail: defaultDetail }: WrapProps) => {
 
   const editorRef = useTiptap({
     editable: true,
+    contentType: isMarkdown ? 'markdown' : 'html',
     immediatelyRender: true,
     content: defaultDetail.content || '',
     exclude: ['invisibleCharacters', 'youtube', 'mention'],
