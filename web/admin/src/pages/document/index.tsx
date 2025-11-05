@@ -8,7 +8,11 @@ import {
 } from '@/components/Drag/DragTree/TreeMenu';
 import { useURLSearchParams } from '@/hooks';
 import { getApiV1NodeList } from '@/request/Node';
-import { ConstsCrawlerSource, DomainNodeListItemResp } from '@/request/types';
+import {
+  ConstsCrawlerSource,
+  ConstsNodeRagInfoStatus,
+  DomainNodeListItemResp,
+} from '@/request/types';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { setIsRefreshDocList } from '@/store/slices/config';
 import { addOpacityToColor } from '@/utils';
@@ -32,6 +36,7 @@ import DocSearch from './component/DocSearch';
 import DocStatus from './component/DocStatus';
 import DocSummary from './component/DocSummary';
 import MoveDocs from './component/MoveDocs';
+import RagErrorReStart from './component/RagErrorReStart';
 import Summary from './component/Summary';
 
 const Content = () => {
@@ -44,10 +49,12 @@ const Content = () => {
   const search = searchParams.get('search') || '';
   const [supportSelect, setBatchOpen] = useState(false);
 
+  const [publishIds, setPublishIds] = useState<string[]>([]);
+  const [publishOpen, setPublishOpen] = useState(false);
   const [publish, setPublish] = useState({
-    // published: 0,
     unpublished: 0,
   });
+  const [ragErrorCount, setRagErrorCount] = useState(0);
   const [list, setList] = useState<DomainNodeListItemResp[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [data, setData] = useState<ITreeItem[]>([]);
@@ -58,11 +65,11 @@ const Content = () => {
   const [moreSummaryOpen, setMoreSummaryOpen] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
   const [urlOpen, setUrlOpen] = useState(false);
-  const [publishIds, setPublishIds] = useState<string[]>([]);
-  const [publishOpen, setPublishOpen] = useState(false);
   const [key, setKey] = useState<ConstsCrawlerSource | null>(null);
   const [propertiesOpen, setPropertiesOpen] = useState(false);
   const [isBatch, setIsBatch] = useState(false);
+  const [ragErrorOpen, setRagErrorOpen] = useState(false);
+  const [ragErrorIds, setRagErrorIds] = useState<string[]>([]);
 
   // 从树形数据中查找节点并转换为列表格式
   const findItemInTree = (
@@ -117,6 +124,11 @@ const Content = () => {
   const handlePublish = (item: ITreeItem) => {
     setPublishOpen(true);
     setPublishIds([item.id]);
+  };
+
+  const handleRagErrorRestart = (item: ITreeItem) => {
+    setRagErrorOpen(true);
+    setRagErrorIds([item.id]);
   };
 
   const handleProperties = (item: ITreeItem) => {
@@ -245,11 +257,18 @@ const Content = () => {
                   },
                 ]
               : []),
-            // {
-            //   label: item.summary ? '查看摘要' : '生成摘要',
-            //   key: 'summary',
-            //   onClick: () => handleSummary(item),
-            // },
+            ...([
+              ConstsNodeRagInfoStatus.NodeRagStatusBasicFailed,
+              ConstsNodeRagInfoStatus.NodeRagStatusEnhanceFailed,
+            ].includes(item.rag_status as ConstsNodeRagInfoStatus)
+              ? [
+                  {
+                    label: '重新学习',
+                    key: 'restart',
+                    onClick: () => handleRagErrorRestart(item),
+                  },
+                ]
+              : []),
           ]
         : []),
       ...(!isEditing
@@ -308,8 +327,17 @@ const Content = () => {
       setList(res || []);
       setPublish({
         unpublished: res.filter(it => it.status === 1).length,
-        // published: res.filter(it => it.status === 2).length,
       });
+      setRagErrorCount(
+        res.filter(
+          it =>
+            it.type === 2 &&
+            [
+              ConstsNodeRagInfoStatus.NodeRagStatusBasicFailed,
+              ConstsNodeRagInfoStatus.NodeRagStatusEnhanceFailed,
+            ].includes(it.rag_info?.status as ConstsNodeRagInfoStatus),
+        ).length,
+      );
       const collapsedAll = collapseAllFolders(convertToTree(res || []), true);
       const next = openIds.size
         ? reopenFolders(collapsedAll, openIds)
@@ -373,16 +401,38 @@ const Content = () => {
                     ml: 2,
                   }}
                 >
-                  {publish.unpublished} 个 文档/文件夹未发布，
+                  {publish.unpublished} 个文档/文件夹未发布，
                 </Box>
                 <Button
                   size='small'
-                  sx={{ minWidth: 0, p: 0, fontSize: 12 }}
+                  sx={{ minWidth: 0, p: 0, fontSize: 12, mr: 3 }}
                   onClick={() => {
                     setPublishOpen(true);
                   }}
                 >
                   去发布
+                </Button>
+              </>
+            )}
+            {ragErrorCount > 0 && (
+              <>
+                <Box
+                  sx={{
+                    color: 'error.main',
+                    fontSize: 12,
+                    fontWeight: 'normal',
+                  }}
+                >
+                  {ragErrorCount} 个文档学习失败，
+                </Box>
+                <Button
+                  size='small'
+                  sx={{ minWidth: 0, p: 0, fontSize: 12 }}
+                  onClick={() => {
+                    setRagErrorOpen(true);
+                  }}
+                >
+                  重新学习
                 </Button>
               </>
             )}
@@ -660,6 +710,15 @@ const Content = () => {
           setStatusOpen(null);
           setOpraData([]);
         }}
+      />
+      <RagErrorReStart
+        open={ragErrorOpen}
+        defaultSelected={ragErrorIds}
+        onClose={() => {
+          setRagErrorOpen(false);
+          setRagErrorIds([]);
+        }}
+        refresh={getData}
       />
       <VersionPublish
         open={publishOpen}
